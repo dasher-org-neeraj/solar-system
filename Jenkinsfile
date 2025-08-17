@@ -3,10 +3,11 @@ pipeline {
     agent any
 
     stages {
-        stage("pipeline test") {
-            steps {
-                echo "Hello world"
-            }
+        steps {
+            sh '''
+                node -v
+                npm -v
+            '''
         }
     }
 }
