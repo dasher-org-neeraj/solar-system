@@ -6,6 +6,7 @@ pipeline {
         stage("pipeline test") {
             steps {
                 echo "Hello world"
+                sh "uname -m"
             }
         }
     }
