@@ -27,6 +27,8 @@ pipeline {
                     steps {
                         echo "Scanning dependencies using owasp"
 
+                        sh 'npm install -g yarn'
+
                         dependencyCheck additionalArguments: '''
                             --scan \'./\'
                             --out \'./\'
