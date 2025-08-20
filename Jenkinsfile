@@ -32,7 +32,7 @@ pipeline {
                             --out \'./\'
                             --format \'ALL\'
                             --prettyPrint
-                            --nvdCredentialsId b3e7726d-3647-4fc6-a293-e2db6482208f
+                            --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f
                             --stopBuild true''',
                             odcInstallation: 'dependency-check-12-1-3'
                     }
