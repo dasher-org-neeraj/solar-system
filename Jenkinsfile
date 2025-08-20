@@ -38,6 +38,18 @@ pipeline {
                             odcInstallation: 'dependency-check-12-1-3'
 
                         dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
+
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: false,
+                            icon: '',
+                            keepAll: false,
+                            reportDir: '.',
+                            reportFiles: 'dependency-check-report.html',
+                            reportName: 'Dependency Check HTML Report',
+                            reportTitles: 'Dependency Check HTML Report',
+                            useWrapperFileDirectly: false
+                        ])
                     }
                 }
             }
