@@ -56,5 +56,12 @@ pipeline {
                 }
             }
         }
+        stage("Unit Test") {
+            steps {
+                echo "Running Unit Tests..."
+
+                sh 'npm test'
+            }
+        }
     }
 }
