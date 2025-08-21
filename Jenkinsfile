@@ -6,6 +6,10 @@ pipeline {
       nodejs 'node-24-0-0'
     }
 
+    environment {
+      MONGO_URI = "mongodb://mongodb:27017/mydb"
+    }
+
     stages {
         stage("Installing Dependencies"){
             steps {
@@ -60,7 +64,9 @@ pipeline {
             steps {
                 echo "Running Unit Tests..."
 
-                sh 'npm test'
+                withCredentials([usernamePassword(credentialsId: 'mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+                    sh 'npm test'
+                }
             }
         }
     }
