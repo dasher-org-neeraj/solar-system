@@ -2,6 +2,11 @@ pipeline {
 
     agent any
 
+    options {
+      buildDiscarder logRotator(artifactNumToKeepStr: '3',numToKeepStr: '3')
+      disableConcurrentBuilds(abortPrevious: true)
+    }
+
     tools {
       nodejs 'node-24-0-0'
     }
@@ -62,6 +67,11 @@ pipeline {
         }
         stage("Unit Test") {
             steps {
+
+                options {
+                    retry(3)
+                }
+
                 echo "Running Unit Tests..."
 
                 withCredentials([usernamePassword(credentialsId: 'mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
@@ -72,7 +82,7 @@ pipeline {
                     sh 'npm test'
                 }
 
-                junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, skipMarkingBuildUnstable: true, stdioRetention: 'ALL', testResults: 'test-results.xml'
+                junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'test-results.xml'
             }
         }
     }
