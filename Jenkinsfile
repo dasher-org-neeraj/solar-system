@@ -65,12 +65,14 @@ pipeline {
                 echo "Running Unit Tests..."
 
                 withCredentials([usernamePassword(credentialsId: 'mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
-                    echo "Seeding database..."
-                    sh 'npm run db:seed'
+//                     echo "Seeding database..."
+//                     sh 'npm run db:seed'
 
                     echo "Running Unit Tests..."
                     sh 'npm test'
                 }
+
+                junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, skipMarkingBuildUnstable: true, stdioRetention: 'ALL', testResults: 'test-results.xml'
             }
         }
     }
