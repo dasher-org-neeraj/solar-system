@@ -18,10 +18,11 @@ pipeline {
     stages {
         stage("Installing Dependencies"){
 
-            options(
+            options {
                 timestamps()
                 timeout(time: 1, unit: 'HOURS')
-            )
+            }
+
             steps {
                 echo "Installing Dependencies..."
 
