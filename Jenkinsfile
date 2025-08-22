@@ -71,11 +71,12 @@ pipeline {
             }
         }
         stage("Unit Test") {
-            steps {
 
-//                 options {
-//                     retry(2)
-//                 }
+            options {
+                retry(2)
+            }
+
+            steps {
 
                 echo "Running Unit Tests..."
 
