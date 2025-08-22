@@ -17,6 +17,11 @@ pipeline {
 
     stages {
         stage("Installing Dependencies"){
+
+            options(
+                timestamps()
+                timeout(time: 1, unit: 'HOURS')
+            )
             steps {
                 echo "Installing Dependencies..."
 
@@ -68,9 +73,9 @@ pipeline {
         stage("Unit Test") {
             steps {
 
-                options {
-                    retry(3)
-                }
+//                 options {
+//                     retry(2)
+//                 }
 
                 echo "Running Unit Tests..."
 
