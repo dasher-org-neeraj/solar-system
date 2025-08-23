@@ -98,7 +98,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     echo "Running coverage Tests..."
 
-                    sh 'npm coverage'
+                    sh 'npm run coverage'
                 }
             }
         }
