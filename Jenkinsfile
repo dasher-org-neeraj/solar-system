@@ -101,6 +101,18 @@ pipeline {
                     catchError(buildResult: 'SUCCESS', message: 'coverage is less than 90%', stageResult: 'UNSTABLE') {
                         sh 'npm run coverage'
                     }
+
+                    publishHTML([
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: true,
+                            icon: '',
+                            keepAll: true,
+                            reportDir: 'coverage/lcov-report/',
+                            reportFiles: 'index.html',
+                            reportName: 'Coverage HTML Report',
+                            reportTitles: 'Coverage HTML Report',
+                            useWrapperFileDirectly: false
+                    ])
                 }
             }
         }
