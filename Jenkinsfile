@@ -73,9 +73,9 @@ pipeline {
         }
         stage("Unit Test") {
 
-            options {
-                retry(2)
-            }
+//             options {
+//                 retry(2)
+//             }
 
             steps {
 
@@ -90,6 +90,16 @@ pipeline {
                 }
 
                 junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'test-results.xml'
+            }
+        }
+        stage("Coverage Testing") {
+            steps {
+
+                withCredentials([usernamePassword(credentialsId: 'mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+                    echo "Running coverage Tests..."
+
+                    sh 'npm coverage'
+                }
             }
         }
     }
