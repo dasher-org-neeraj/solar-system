@@ -53,20 +53,6 @@ pipeline {
                             odcInstallation: 'dependency-check-12-1-3'
 
                         dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
-
-                        junit allowEmptyResults: true, stdioRetention: 'FAILED', testResults: 'dependency-check-junit.xml'
-
-                        publishHTML([
-                            allowMissing: true,
-                            alwaysLinkToLastBuild: true,
-                            icon: '',
-                            keepAll: true,
-                            reportDir: '.',
-                            reportFiles: 'dependency-check-report.html',
-                            reportName: 'Dependency Check HTML Report',
-                            reportTitles: 'Dependency Check HTML Report',
-                            useWrapperFileDirectly: false
-                        ])
                     }
                 }
             }
@@ -88,8 +74,6 @@ pipeline {
                     echo "Running Unit Tests..."
                     sh 'npm test'
                 }
-
-                junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'test-results.xml'
             }
         }
         stage("Coverage Testing") {
@@ -101,20 +85,39 @@ pipeline {
                     catchError(buildResult: 'SUCCESS', message: 'coverage is less than 80%', stageResult: 'UNSTABLE') {
                         sh 'npm run coverage'
                     }
-
-                    publishHTML([
-                            allowMissing: true,
-                            alwaysLinkToLastBuild: true,
-                            icon: '',
-                            keepAll: true,
-                            reportDir: 'coverage/lcov-report/',
-                            reportFiles: 'index.html',
-                            reportName: 'Coverage HTML Report',
-                            reportTitles: 'Coverage HTML Report',
-                            useWrapperFileDirectly: false
-                    ])
                 }
             }
         }
+    }
+    post {
+      always {
+        junit allowEmptyResults: true, stdioRetention: 'FAILED', testResults: 'dependency-check-junit.xml'
+
+        publishHTML([
+            allowMissing: true,
+            alwaysLinkToLastBuild: true,
+            icon: '',
+            keepAll: true,
+            reportDir: '.',
+            reportFiles: 'dependency-check-report.html',
+            reportName: 'Dependency Check HTML Report',
+            reportTitles: 'Dependency Check HTML Report',
+            useWrapperFileDirectly: false
+        ])
+
+        junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'test-results.xml'
+
+        publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                icon: '',
+                keepAll: true,
+                reportDir: 'coverage/lcov-report/',
+                reportFiles: 'index.html',
+                reportName: 'Coverage HTML Report',
+                reportTitles: 'Coverage HTML Report',
+                useWrapperFileDirectly: false
+        ])
+      }
     }
 }
