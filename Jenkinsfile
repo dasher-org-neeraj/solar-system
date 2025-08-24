@@ -98,7 +98,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     echo "Running coverage Tests..."
 
-                    catchError(buildResult: 'SUCCESS', message: 'coverage is less than 90%', stageResult: 'UNSTABLE') {
+                    catchError(buildResult: 'SUCCESS', message: 'coverage is less than 80%', stageResult: 'UNSTABLE') {
                         sh 'npm run coverage'
                     }
 
