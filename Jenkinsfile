@@ -49,7 +49,8 @@ pipeline {
                             --out \'./\'
                             --format \'ALL\'
                             --prettyPrint
-                            --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f''',
+                            --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f
+                            --disableYarnAudit''',
                             odcInstallation: 'dependency-check-12-1-3'
 
                         dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
@@ -100,7 +101,10 @@ pipeline {
                 }
 
                 timeout(time: 1, unit: 'HOURS') {
-                  waitForQualityGate abortPipeline: true
+                  def qualityGatePayload = waitForQualityGate()
+                  if (qualityGatePayload.status != 'OK') {
+                    error "Pipeline aborted due to quality gate failure: ${qualityGatePayload.status}""
+                  }
                 }
             }
         }
