@@ -13,7 +13,6 @@ pipeline {
 
     environment {
       MONGO_URI = "mongodb://mongodb:27017/mydb"
-      SONARQUBE_SCANNER_HOME = tool 'sonarqube-710'
     }
 
     stages {
@@ -69,8 +68,8 @@ pipeline {
                 echo "Running Unit Tests..."
 
                 withCredentials([usernamePassword(credentialsId: 'mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
-                    echo "Seeding database..."
-                    sh 'npm run db:seed'
+//                     echo "Seeding database..."
+//                     sh 'npm run db:seed'
 
                     echo "Running Unit Tests..."
                     sh 'npm test'
@@ -89,16 +88,16 @@ pipeline {
                 }
             }
         }
-        stage("SATS - Sonarqube") {
+        stage("SAST - Sonarqube") {
             steps {
-                echo "sonar scanner cli path: ${SONARQUBE_SCANNER_HOME}"
-                sh '''
-                    $SONARQUBE_SCANNER_HOME/bin/sonar-scanner \
-                      -Dsonar.projectKey=solar-system \
-                      -Dsonar.sources=. \
-                      -Dsonar.host.url=http://sonar:9000 \
-                      -Dsonar.token=sqp_7dc55aaa5842789a8f3de3c19a8dfbb8f8ef7feb
-                '''
+                withSonarQubeEnv('sonarqube-server') {
+                    sh '''
+                        npm run sonar -- \
+                            -Dsonar.projectKey=solar-system \
+                            -Dsonar.sources=./app.js \
+                            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+                    '''
+                }
             }
         }
     }
