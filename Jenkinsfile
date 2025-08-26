@@ -98,6 +98,10 @@ pipeline {
                             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                     '''
                 }
+
+                timeout(time: 1, unit: 'HOURS') {
+                  waitForQualityGate abortPipeline: true
+                }
             }
         }
     }
