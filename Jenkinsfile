@@ -99,12 +99,13 @@ pipeline {
                             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                     '''
                 }
-
-                timeout(time: 1, unit: 'HOURS') {
-                  def qualityGatePayload = waitForQualityGate()
-                  if (qualityGatePayload.status != 'OK') {
-                    error "Pipeline aborted due to quality gate failure: ${qualityGatePayload.status}"
-                  }
+                script {
+                    timeout(time: 1, unit: 'HOURS') {
+                      def qualityGatePayload = waitForQualityGate()
+                      if (qualityGatePayload.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qualityGatePayload.status}"
+                      }
+                    }
                 }
             }
         }
