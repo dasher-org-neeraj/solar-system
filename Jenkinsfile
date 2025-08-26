@@ -13,7 +13,7 @@ pipeline {
 
     environment {
       MONGO_URI = "mongodb://mongodb:27017/mydb"
-      SONARQUBE_SCANNER_HOME = tools 'sonarqube-710'
+      SONARQUBE_SCANNER_HOME = tool 'sonarqube-710'
     }
 
     stages {
@@ -89,17 +89,18 @@ pipeline {
                 }
             }
         }
-//         stage("SATS - Sonarqube") {
-//             steps {
-//                 sh '''
-//                     sonar-scanner \
-//                       -Dsonar.projectKey=solar-system \
-//                       -Dsonar.sources=. \
-//                       -Dsonar.host.url=http://sonar:9000 \
-//                       -Dsonar.token=sqa_36178c922238e4198d24d28d40a55be3e330f654
-//                 '''
-//             }
-//         }
+        stage("SATS - Sonarqube") {
+            steps {
+                echo "sonar scanner cli path: ${SONARQUBE_SCANNER_HOME}"
+                sh '''
+                    $SONARQUBE_SCANNER_HOME/bin/sonar-scanner \
+                      -Dsonar.projectKey=solar-system \
+                      -Dsonar.sources=. \
+                      -Dsonar.host.url=http://sonar:9000 \
+                      -Dsonar.token=sqp_7dc55aaa5842789a8f3de3c19a8dfbb8f8ef7feb
+                '''
+            }
+        }
     }
     post {
       always {
