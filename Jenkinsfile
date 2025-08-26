@@ -89,17 +89,17 @@ pipeline {
                 }
             }
         }
-        stage("SATS - Sonarqube") {
-            steps {
-                sh '''
-                    sonar-scanner \
-                      -Dsonar.projectKey=solar-system \
-                      -Dsonar.sources=. \
-                      -Dsonar.host.url=http://sonar:9000 \
-                      -Dsonar.token=sqa_36178c922238e4198d24d28d40a55be3e330f654
-                '''
-            }
-        }
+//         stage("SATS - Sonarqube") {
+//             steps {
+//                 sh '''
+//                     sonar-scanner \
+//                       -Dsonar.projectKey=solar-system \
+//                       -Dsonar.sources=. \
+//                       -Dsonar.host.url=http://sonar:9000 \
+//                       -Dsonar.token=sqa_36178c922238e4198d24d28d40a55be3e330f654
+//                 '''
+//             }
+//         }
     }
     post {
       always {
