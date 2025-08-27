@@ -109,6 +109,17 @@ pipeline {
                 }
             }
         }
+        stage('Build Docker Image') {
+            agent {
+                labels 'docker'
+            }
+            steps {
+                echo "Building Docker Image..."
+
+                sh 'printenv'
+                sh 'docker build . -t solar-system:$GIT_COMMIT'
+            }
+        }
     }
     post {
       always {
