@@ -69,8 +69,8 @@ pipeline {
                 echo "Running Unit Tests..."
 
                 withCredentials([usernamePassword(credentialsId: 'mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
-                    echo "Seeding database..."
-                    sh 'npm run db:seed'
+//                     echo "Seeding database..."
+//                     sh 'npm run db:seed'
 
                     echo "Running Unit Tests..."
                     sh 'npm test'
@@ -111,7 +111,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             agent {
-                labels 'docker'
+                label 'docker'
             }
             steps {
                 echo "Building Docker Image..."
