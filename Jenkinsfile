@@ -1,6 +1,8 @@
 pipeline {
 
-    agent any
+    agent {
+        label "built-in"
+    }
 
     options {
       buildDiscarder logRotator(artifactNumToKeepStr: '3',numToKeepStr: '3')
