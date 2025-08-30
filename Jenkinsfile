@@ -147,14 +147,14 @@ pipeline {
                 sh '''
                     set -ex
                     trivy image \
-                        --severity LOW, MEDIUM \
+                        --severity LOW,MEDIUM \
                         --exit-code 0 \
                         --quiet \
                         --format json -o trivy-image-MEDIUM-results.json
                     solar-system:$GIT_COMMIT
 
                     trivy image \
-                        --severity HIGH, CRITICAL \
+                        --severity HIGH,CRITICAL \
                         --exit-code 1 \
                         --quiet \
                         --format json -o trivy-image-CRITICAL-results.json
