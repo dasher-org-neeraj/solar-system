@@ -1,7 +1,7 @@
 pipeline {
 
     agent {
-        label "built-in"
+        label "docker"
     }
 
     options {
@@ -127,9 +127,9 @@ pipeline {
             }
         }
         stage('Build Docker Image') {
-            agent {
-                label 'docker'
-            }
+//             agent {
+//                 label 'docker'
+//             }
             steps {
                 echo "Building Docker Image..."
 
@@ -138,9 +138,9 @@ pipeline {
             }
         }
         stage('Trivy Vulnerability Scanning') {
-            agent {
-                label 'docker'
-            }
+//             agent {
+//                 label 'docker'
+//             }
             steps {
                 echo "Vulnerability Scanning using Trivy..."
 
@@ -164,6 +164,7 @@ pipeline {
             post {
                 always {
                     sh '''
+                        set -ex
                         trivy convert \
                             --format template \
                             --template "@/usr/local/share/trivy/templates/html.tpl" \
