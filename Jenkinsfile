@@ -192,6 +192,24 @@ pipeline {
                 }
             }
         }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://hub.docker.com/', 'docker-login-creds') {
+                        def tags = ["${GIT_COMMIT}", "latest", "${currentBuild.number}"]
+
+                        tags.each { tag ->
+                            sh """
+                                set -ex
+                                docker tag solar-system:$GIT_COMMIT neeraj05902/solar-syatem:${tag}
+
+                                docker push neeraj05902/solar-syatem:${tag}
+                            """
+                        }
+                    }
+                }
+            }
+        }
     }
     post {
 
