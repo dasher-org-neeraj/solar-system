@@ -102,7 +102,7 @@ pipeline {
             }
             post {
                 always {
-                    stash allowEmpty: true, includes: 'coverage/lcov.info/*.html', name: 'coverage-reports'
+                    stash allowEmpty: true, includes: 'coverage/lcov-report/*.html', name: 'coverage-reports'
                 }
             }
         }
@@ -146,17 +146,19 @@ pipeline {
 
                 sh '''
                     set -ex
-                    trivy image solar-system:$GIT_COMMIT \
+                    trivy image \
                         --severity LOW, MEDIUM \
                         --exit-code 0 \
                         --quiet \
                         --format json -o trivy-image-MEDIUM-results.json
+                    solar-system:$GIT_COMMIT
 
-                    trivy image solar-system:$GIT_COMMIT \
+                    trivy image \
                         --severity HIGH, CRITICAL \
                         --exit-code 1 \
                         --quiet \
                         --format json -o trivy-image-CRITICAL-results.json
+                    solar-system:$GIT_COMMIT
                 '''
             }
             post {
