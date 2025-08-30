@@ -57,11 +57,11 @@ pipeline {
 
                         dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
                     }
-                    post {
-                        always {
-                            stash  name: 'owasp-reports', includes: 'dependency-check-report.*,dependency-check-junit.xml', allowEmpty: true
-                        }
-                    }
+//                     post {
+//                         always {
+//                             stash  name: 'owasp-reports', includes: 'dependency-check-report.*,dependency-check-junit.xml', allowEmpty: true
+//                         }
+//                     }
                 }
             }
         }
@@ -83,11 +83,11 @@ pipeline {
                     sh 'npm test'
                 }
             }
-            post {
-                always {
-                    stash allowEmpty: true, includes: 'test-results.xml', name: 'unit-test-reports'
-                }
-            }
+//             post {
+//                 always {
+//                     stash allowEmpty: true, includes: 'test-results.xml', name: 'unit-test-reports'
+//                 }
+//             }
         }
         stage("Coverage Testing") {
             steps {
@@ -100,11 +100,11 @@ pipeline {
                     }
                 }
             }
-            post {
-                always {
-                    stash allowEmpty: true, includes: 'coverage/lcov-report/*.html', name: 'coverage-reports'
-                }
-            }
+//             post {
+//                 always {
+//                     stash allowEmpty: true, includes: 'coverage/lcov-report/*.html', name: 'coverage-reports'
+//                 }
+//             }
         }
         stage("SAST - Sonarqube") {
             steps {
@@ -193,11 +193,14 @@ pipeline {
         }
     }
     post {
+
+//     Note: post block runs on node where last stage executes. As last stage execution happens on docker-agent node, therefor post block will also execute on docker-agent
+
       always {
 
-        unstash 'owasp-reports'
-        unstash 'unit-test-reports'
-        unstash 'coverage-reports'
+//         unstash 'owasp-reports'
+//         unstash 'unit-test-reports'
+//         unstash 'coverage-reports'
 
         junit allowEmptyResults: true, stdioRetention: 'FAILED', testResults: 'dependency-check-junit.xml'
 
