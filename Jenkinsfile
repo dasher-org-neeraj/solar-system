@@ -195,7 +195,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://hub.docker.com/', 'docker-login-creds') {
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker-login-creds') {
                         def tags = ["${GIT_COMMIT}", "latest", "${currentBuild.number}"]
 
                         tags.each { tag ->
