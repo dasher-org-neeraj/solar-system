@@ -57,6 +57,11 @@ pipeline {
 
                         dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
                     }
+                    post {
+                        always {
+                            stash  name: 'owasp-reports', includes: 'dependency-check-report.*,dependency-check-junit.xml', allowEmpty: true
+                        }
+                    }
                 }
             }
         }
@@ -78,6 +83,11 @@ pipeline {
                     sh 'npm test'
                 }
             }
+            post {
+                always {
+                    stash allowEmpty: true, includes: 'test-results.xml', name: 'unit-test-reports'
+                }
+            }
         }
         stage("Coverage Testing") {
             steps {
@@ -88,6 +98,11 @@ pipeline {
                     catchError(buildResult: 'SUCCESS', message: 'coverage is less than 80%', stageResult: 'UNSTABLE') {
                         sh 'npm run coverage'
                     }
+                }
+            }
+            post {
+                always {
+                    stash allowEmpty: true, includes: 'coverage/lcov.info/*.html', name: 'coverage-reports'
                 }
             }
         }
@@ -123,6 +138,9 @@ pipeline {
             }
         }
         stage('Trivy Vulnerability Scanning') {
+            agent {
+                label 'docker'
+            }
             steps {
                 echo "Vulnerability Scanning using Trivy..."
 
@@ -141,66 +159,44 @@ pipeline {
                         --format json -o trivy-image-CRITICAL-results.json
                 '''
             }
-        }post {
-            always {
-                sh '''
-                    trivy convert \
-                        --format template \
-                        --template "@/usr/local/share/trivy/templates/html.tpl" \
-                        -o trivy-image-MEDIUM-results.html \
-                    trivy-image-MEDIUM-results.json
+            post {
+                always {
+                    sh '''
+                        trivy convert \
+                            --format template \
+                            --template "@/usr/local/share/trivy/templates/html.tpl" \
+                            -o trivy-image-MEDIUM-results.html \
+                        trivy-image-MEDIUM-results.json
 
-                    trivy convert \
-                        --format template \
-                        --template "@/usr/local/share/trivy/templates/html.tpl" \
-                        -o trivy-image-CRITICAL-results.html \
-                    trivy-image-CRITICAL-results.json
+                        trivy convert \
+                            --format template \
+                            --template "@/usr/local/share/trivy/templates/html.tpl" \
+                            -o trivy-image-CRITICAL-results.html \
+                        trivy-image-CRITICAL-results.json
 
-                    trivy convert \
-                        --format template \
-                        --template "@/usr/local/share/trivy/templates/junit.tpl" \
-                        -o trivy-image-MEDIUM-results.xml \
-                    trivy-image-MEDIUM-results.json
+                        trivy convert \
+                            --format template \
+                            --template "@/usr/local/share/trivy/templates/junit.tpl" \
+                            -o trivy-image-MEDIUM-results.xml \
+                        trivy-image-MEDIUM-results.json
 
-                    trivy convert \
-                        --format template \
-                        --template "@/usr/local/share/trivy/templates/junit.tpl" \
-                        -o trivy-image-CRITICAL-results.xml \
-                    trivy-image-CRITICAL-results.json
-                '''
-
-                publishHTML([
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    icon: '',
-                    keepAll: true,
-                    reportDir: '.',
-                    reportFiles: 'trivy-image-MEDIUM-results.html',
-                    reportName: 'TRIVY LOW-MEDIUM SEVERITY VULNERABILITIES HTML Report',
-                    reportTitles: 'TRIVY LOW-MEDIUM SEVERITY VULNERABILITIES HTML Report',
-                    useWrapperFileDirectly: false
-                ])
-
-                publishHTML([
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    icon: '',
-                    keepAll: true,
-                    reportDir: '.',
-                    reportFiles: 'trivy-image-CRITICAL-results.html',
-                    reportName: 'TRIVY HIGH-CRITICAL SEVERITY VULNERABILITIES HTML Report',
-                    reportTitles: 'TRIVY HIGH-CRITICAL SEVERITY VULNERABILITIES HTML Report',
-                    useWrapperFileDirectly: false
-                ])
-
-                junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'trivy-image-MEDIUM-results.xml'
-
-                junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'trivy-image-CRITICAL-results.xml'
+                        trivy convert \
+                            --format template \
+                            --template "@/usr/local/share/trivy/templates/junit.tpl" \
+                            -o trivy-image-CRITICAL-results.xml \
+                        trivy-image-CRITICAL-results.json
+                    '''
+                }
             }
         }
     }
     post {
       always {
+
+        unstash 'owasp-reports'
+        unstash 'unit-test-reports'
+        unstash 'coverage-reports'
+
         junit allowEmptyResults: true, stdioRetention: 'FAILED', testResults: 'dependency-check-junit.xml'
 
         publishHTML([
@@ -228,6 +224,34 @@ pipeline {
                 reportTitles: 'Coverage HTML Report',
                 useWrapperFileDirectly: false
         ])
+
+        publishHTML([
+            allowMissing: true,
+            alwaysLinkToLastBuild: true,
+            icon: '',
+            keepAll: true,
+            reportDir: '.',
+            reportFiles: 'trivy-image-MEDIUM-results.html',
+            reportName: 'TRIVY LOW-MEDIUM SEVERITY VULNERABILITIES HTML Report',
+            reportTitles: 'TRIVY LOW-MEDIUM SEVERITY VULNERABILITIES HTML Report',
+            useWrapperFileDirectly: false
+        ])
+
+        publishHTML([
+            allowMissing: true,
+            alwaysLinkToLastBuild: true,
+            icon: '',
+            keepAll: true,
+            reportDir: '.',
+            reportFiles: 'trivy-image-CRITICAL-results.html',
+            reportName: 'TRIVY HIGH-CRITICAL SEVERITY VULNERABILITIES HTML Report',
+            reportTitles: 'TRIVY HIGH-CRITICAL SEVERITY VULNERABILITIES HTML Report',
+            useWrapperFileDirectly: false
+        ])
+
+        junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'trivy-image-MEDIUM-results.xml'
+
+        junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'trivy-image-CRITICAL-results.xml'
       }
     }
 }
