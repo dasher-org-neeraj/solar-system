@@ -71,8 +71,8 @@ pipeline {
                 echo "Running Unit Tests..."
 
                 withCredentials([usernamePassword(credentialsId: 'mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
-                    echo "Seeding database..."
-                    sh 'npm run db:seed'
+//                    ` echo "Seeding database..."
+//                     sh 'npm run db:seed'`
 
                     echo "Running Unit Tests..."
                     sh 'npm test'
@@ -120,6 +120,82 @@ pipeline {
 
                 sh 'printenv'
                 sh 'docker build . -t solar-system:$GIT_COMMIT'
+            }
+        }
+        stage('Trivy Vulnerability Scanning') {
+            steps {
+                echo "Vulnerability Scanning using Trivy..."
+
+                sh '''
+                    set -ex
+                    trivy image solar-system:$GIT_COMMIT \
+                        --severity LOW, MEDIUM \
+                        --exit-code 0 \
+                        --quiet \
+                        --format json -o trivy-image-MEDIUM-results.json
+
+                    trivy image solar-system:$GIT_COMMIT \
+                        --severity HIGH, CRITICAL \
+                        --exit-code 1 \
+                        --quiet \
+                        --format json -o trivy-image-CRITICAL-results.json
+                '''
+            }
+        }post {
+            always {
+                sh '''
+                    trivy convert \
+                        --format template \
+                        --template "@/usr/local/share/trivy/templates/html.tpl" \
+                        -o trivy-image-MEDIUM-results.html \
+                    trivy-image-MEDIUM-results.json
+
+                    trivy convert \
+                        --format template \
+                        --template "@/usr/local/share/trivy/templates/html.tpl" \
+                        -o trivy-image-CRITICAL-results.html \
+                    trivy-image-CRITICAL-results.json
+
+                    trivy convert \
+                        --format template \
+                        --template "@/usr/local/share/trivy/templates/junit.tpl" \
+                        -o trivy-image-MEDIUM-results.xml \
+                    trivy-image-MEDIUM-results.json
+
+                    trivy convert \
+                        --format template \
+                        --template "@/usr/local/share/trivy/templates/junit.tpl" \
+                        -o trivy-image-CRITICAL-results.xml \
+                    trivy-image-CRITICAL-results.json
+                '''
+
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    icon: '',
+                    keepAll: true,
+                    reportDir: '.',
+                    reportFiles: 'trivy-image-MEDIUM-results.html',
+                    reportName: 'TRIVY LOW-MEDIUM SEVERITY VULNERABILITIES HTML Report',
+                    reportTitles: 'TRIVY LOW-MEDIUM SEVERITY VULNERABILITIES HTML Report',
+                    useWrapperFileDirectly: false
+                ])
+
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    icon: '',
+                    keepAll: true,
+                    reportDir: '.',
+                    reportFiles: 'trivy-image-CRITICAL-results.html',
+                    reportName: 'TRIVY HIGH-CRITICAL SEVERITY VULNERABILITIES HTML Report',
+                    reportTitles: 'TRIVY HIGH-CRITICAL SEVERITY VULNERABILITIES HTML Report',
+                    useWrapperFileDirectly: false
+                ])
+
+                junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'trivy-image-MEDIUM-results.xml'
+
+                junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'trivy-image-CRITICAL-results.xml'
             }
         }
     }
