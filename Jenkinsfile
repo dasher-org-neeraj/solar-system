@@ -7,11 +7,12 @@ pipeline {
     }
 
     stages {
-        stage("Node Version Check") {
+        stage("Install Dependencies") {
             steps {
+                echo "Installing Dependencies..."
+
                 sh '''
-                    node -v
-                    npm -v
+                    npm install --no-audit
                 '''
             }
         }
