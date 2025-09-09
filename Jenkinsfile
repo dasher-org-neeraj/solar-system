@@ -12,7 +12,18 @@ pipeline {
                 echo "Installing Dependencies..."
 
                 sh '''
+                    set -ex
                     npm install --no-audit
+                '''
+            }
+        }
+        stage('NPM Dependency Scanning') {
+            steps {
+                echo "NPM Dependency Scanning..."
+
+                sh '''
+                    set -ex
+                    npm audit --audit-level=critical
                 '''
             }
         }
