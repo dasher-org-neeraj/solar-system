@@ -6,6 +6,10 @@ pipeline {
         nodejs "nodejs-24-4-1"
     }
 
+    environment {
+      MONGO_URI = "mongodb://mongodb-svc:27017/mydb"
+    }
+
     stages {
         stage("Install Dependencies") {
             steps {
@@ -21,7 +25,7 @@ pipeline {
             parallel {
                 stage('NPM Dependency Scanning') {
                     steps {
-                        echo "NPM Dependency Scanning..."
+                        echo "Scanning Dependencies using npm audit..."
 
                         sh '''
                             set -ex
@@ -44,6 +48,21 @@ pipeline {
 
                         dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
                     }
+                }
+            }
+        }
+        stage('Unit Testing') {
+            steps {
+
+                echo "Seeding Planets Data For Unit Testing..."
+
+                withCredentials([usernamePassword(credentialsId: 'Mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+
+                    sh 'npm run db:seed'
+
+                    echo "Unit Testing In Progress..."
+
+                    sh 'npm run test'
                 }
             }
         }
