@@ -19,7 +19,7 @@ pipeline {
         stage("Install Dependencies") {
 
             options {
-              timestamps
+              timestamps()
             }
 
             steps {
@@ -78,9 +78,13 @@ pipeline {
         }
         stage("Coverage Testing") {
             steps {
-                echo "Coverage Testing In Progress..."
 
-                sh 'npn run coverage'
+                withCredentials([usernamePassword(credentialsId: 'Mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+
+                    echo "Coverage Testing In Progress..."
+
+                    sh 'npn run coverage'
+                }
             }
         }
     }
