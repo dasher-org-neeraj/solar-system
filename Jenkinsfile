@@ -83,7 +83,7 @@ pipeline {
 
                     echo "Coverage Testing In Progress..."
 
-                    sh 'npn run coverage'
+                    sh 'npm run coverage'
                 }
             }
         }
