@@ -10,8 +10,18 @@ pipeline {
       MONGO_URI = "mongodb://mongodb-svc:27017/mydb"
     }
 
+    options {
+      buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '1', daysToKeepStr: '', numToKeepStr: '3')
+      disableConcurrentBuilds abortPrevious: true
+    }
+
     stages {
         stage("Install Dependencies") {
+
+            options {
+              timestamps
+            }
+
             steps {
                 echo "Installing Dependencies..."
 
@@ -54,16 +64,23 @@ pipeline {
         stage('Unit Testing') {
             steps {
 
-                echo "Seeding Planets Data For Unit Testing..."
+//                 echo "Seeding Planets Data For Unit Testing..."
 
                 withCredentials([usernamePassword(credentialsId: 'Mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
 
-                    sh 'npm run db:seed'
+//                     sh 'npm run db:seed'
 
                     echo "Unit Testing In Progress..."
 
                     sh 'npm run test'
                 }
+            }
+        }
+        stage("Coverage Testing") {
+            steps {
+                echo "Coverage Testing In Progress..."
+
+                sh 'npn run coverage'
             }
         }
     }
@@ -82,6 +99,8 @@ pipeline {
                 reportTitles: 'Dependency Check HTML Report',
                 useWrapperFileDirectly: false
             ])
+
+            junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'test-results.xml'
         }
     }
 }
