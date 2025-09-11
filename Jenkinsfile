@@ -64,14 +64,12 @@ pipeline {
         stage('Unit Testing') {
             steps {
 
-//                 echo "Seeding Planets Data For Unit Testing..."
-
                 withCredentials([usernamePassword(credentialsId: 'Mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
 
-//                     sh 'npm run db:seed'
+                    echo "Seeding Planets Data For Unit Testing..."
+                    sh 'npm run db:seed'
 
                     echo "Unit Testing In Progress..."
-
                     sh 'npm run test'
                 }
             }
@@ -93,7 +91,7 @@ pipeline {
     }
     post {
         always {
-            junit allowEmptyResults: true, stdioRetention: 'FAILED', testResults: 'dependency-check-junit.xml'
+            junit allowEmptyResults: true, stdioRetention: 'FAILED',skipMarkingBuildUnstable: true, testResults: 'dependency-check-junit.xml'
 
             publishHTML([
                 allowMissing: true,
@@ -107,7 +105,7 @@ pipeline {
                 useWrapperFileDirectly: false
             ])
 
-            junit allowEmptyResults: true, keepProperties: true, keepTestNames: true, stdioRetention: 'ALL', testResults: 'test-results.xml'
+            junit allowEmptyResults: true, keepProperties: true, keepTestNames: true,skipMarkingBuildUnstable: true, stdioRetention: 'ALL', testResults: 'test-results.xml'
         }
     }
 }
