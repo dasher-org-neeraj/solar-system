@@ -58,6 +58,8 @@ pipeline {
                             --disableYarnAudit''',
                             odcInstallation: 'dependency-check-12-1-3'
 
+                         sh 'sleep 7200'
+
                         dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
                     }
                 }
