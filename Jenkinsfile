@@ -1,6 +1,8 @@
 pipeline {
 
-    agent any
+    agent {
+        label 'solar-system-agent'
+    }
 
     tools {
         nodejs "nodejs-24-4-1"
