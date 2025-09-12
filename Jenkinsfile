@@ -25,7 +25,6 @@ pipeline {
             }
 
             steps {
-                sh 'sleep 7200'
                 echo "Installing Dependencies..."
 
                 sh '''
