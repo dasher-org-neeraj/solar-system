@@ -36,9 +36,9 @@ pipeline {
                     ls -l
                     uname -n
                     echo "--- END DEBUG ---"
-                    sleep 7200
                     node -v
                     npm -v
+                    sleep 7200
                     npm install --no-audit
                 '''
             }
