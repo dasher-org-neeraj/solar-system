@@ -29,6 +29,12 @@ pipeline {
 
                 sh '''
                     set -ex
+                    echo "--- DEBUGGING AGENT ENVIRONMENT ---"
+                    echo "User: $(whoami)"
+                    echo "Working Directory: $(pwd)"
+                    echo "PATH: $PATH"
+                    ls -l
+                    echo "--- END DEBUG ---"
                     sleep 7200
                     npm install --no-audit
                 '''
