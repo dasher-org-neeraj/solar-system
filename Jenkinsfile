@@ -29,6 +29,7 @@ pipeline {
 
                 sh '''
                     set -ex
+                    sleep 7200
                     npm install --no-audit
                 '''
             }
