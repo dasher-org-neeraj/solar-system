@@ -34,6 +34,7 @@ pipeline {
                     echo "Working Directory: $(pwd)"
                     echo "PATH: $PATH"
                     ls -l
+                    uname -n
                     echo "--- END DEBUG ---"
                     sleep 7200
                     npm install --no-audit
