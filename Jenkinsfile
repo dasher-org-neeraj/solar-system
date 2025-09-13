@@ -4,9 +4,9 @@ pipeline {
         label 'solar-system-agent'
     }
 
-    tools {
-        nodejs "nodejs-24-4-1"
-    }
+//     tools {
+//         nodejs "nodejs-24-4-1"
+//     }
 
     environment {
       MONGO_URI = "mongodb://mongodb-svc:27017/mydb"
@@ -55,8 +55,8 @@ pipeline {
                             --format \'ALL\'
                             --prettyPrint
                             --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f
-                            --disableYarnAudit''',
-                            odcInstallation: 'dependency-check-12-1-3'
+                            --disableYarnAudit'''
+//                             odcInstallation: 'dependency-check-12-1-3'
 
                         sh 'sleep 7200'
 
