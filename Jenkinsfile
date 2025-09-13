@@ -49,14 +49,25 @@ pipeline {
                     steps {
                         echo "Scanning Dependencies using owasp..."
 
-                        dependencyCheck additionalArguments: '''
-                            --scan \'./\'
-                            --out \'./\'
-                            --format \'ALL\'
-                            --prettyPrint
-                            --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f
-                            --disableYarnAudit'''
-//                             odcInstallation: 'dependency-check-12-1-3'
+                        sh '''
+                            set -ex
+                            dependency-check.sh \
+                            --scan \'./\' \
+                            --out \'./\' \
+                            --format \'ALL\' \
+                            --prettyPrint \
+                            --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f \
+                            --disableYarnAudit
+                        '''
+
+//                         dependencyCheck additionalArguments: '''
+//                             --scan \'./\'
+//                             --out \'./\'
+//                             --format \'ALL\'
+//                             --prettyPrint
+//                             --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f
+//                             --disableYarnAudit'''
+// //                             odcInstallation: 'dependency-check-12-1-3'
 
                         sh 'sleep 7200'
 
