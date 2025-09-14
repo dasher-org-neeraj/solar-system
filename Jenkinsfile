@@ -41,15 +41,8 @@ pipeline {
     }
 
     stages {
-        stage("Install Dependencies") {
-
-            options {
-              timestamps()
-            }
-
+        stage('Debug') {
             steps {
-                echo "Installing Dependencies..."
-
                 sh '''
                     set -ex
                     echo "--- DEBUGGING AGENT ENVIRONMENT ---"
@@ -62,6 +55,20 @@ pipeline {
                     npm version
                     sleep 7200
                     echo "--- END DEBUG ---"
+                '''
+            }
+        }
+        stage("Install Dependencies") {
+
+            options {
+              timestamps()
+            }
+
+            steps {
+                echo "Installing Dependencies..."
+
+                sh '''
+                    set -ex
                     npm install --no-audit
                 '''
             }
