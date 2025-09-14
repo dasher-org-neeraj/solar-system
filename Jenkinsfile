@@ -48,20 +48,22 @@ pipeline {
     stages {
         stage('Debug') {
             steps {
-                sh '''
-                    set -ex
-                    echo "--- DEBUGGING AGENT ENVIRONMENT ---"
-                    echo "Running in container: $MY_CONTAINER_NAME"
-                    echo "User: $(whoami)"
-                    echo "Working Directory: $(pwd)"
-                    echo "PATH: $PATH"
-                    ls -l
-                    uname -n
-                    node -v
-                    npm version
-                    sleep 7200
-                    echo "--- END DEBUG ---"
-                '''
+                container('test-pod') {
+                    sh '''
+                        set -ex
+                        echo "--- DEBUGGING AGENT ENVIRONMENT ---"
+                        echo "Running in container: $MY_CONTAINER_NAME"
+                        echo "User: $(whoami)"
+                        echo "Working Directory: $(pwd)"
+                        echo "PATH: $PATH"
+                        ls -l
+                        uname -n
+                        node -v
+                        npm version
+                        sleep 7200
+                        echo "--- END DEBUG ---"
+                    '''
+                }
             }
         }
         stage("Install Dependencies") {
