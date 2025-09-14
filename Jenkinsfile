@@ -1,8 +1,31 @@
 pipeline {
 
     agent {
-        label 'solar-system-agent'
+      kubernetes {
+            yaml '''
+                apiVersion: v1
+                kind: Pod
+                metadata:
+                  labels:
+                    run: test-pod
+                  name: test-pod
+                spec:
+                  containers:
+                  - command:
+                    - sleep
+                    - "99999"
+                    image: node:24.8.0-alpine
+                    name: test-pod
+                    resources: {}
+                  restartPolicy: Never
+            '''
+      }
     }
+
+
+//     agent {
+//         label 'solar-system-agent'
+//     }
 
 //     tools {
 //         nodejs "nodejs-24-4-1"
