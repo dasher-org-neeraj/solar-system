@@ -58,8 +58,10 @@ pipeline {
                     echo "PATH: $PATH"
                     ls -l
                     uname -n
-                    echo "--- END DEBUG ---"
+                    node -v
+                    npm version
                     sleep 7200
+                    echo "--- END DEBUG ---"
                     npm install --no-audit
                 '''
             }
