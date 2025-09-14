@@ -14,6 +14,11 @@ pipeline {
                   - command:
                     - sleep
                     - "99999"
+                    env:
+                        - name: CONTAINER_NAME
+                          valueFrom:
+                            fieldRef:
+                              fieldPath: metadata.name
                     image: node:24.8.0-alpine
                     name: test-pod
                     resources: {}
@@ -46,6 +51,7 @@ pipeline {
                 sh '''
                     set -ex
                     echo "--- DEBUGGING AGENT ENVIRONMENT ---"
+                    echo "Running in container: $MY_CONTAINER_NAME"
                     echo "User: $(whoami)"
                     echo "Working Directory: $(pwd)"
                     echo "PATH: $PATH"
