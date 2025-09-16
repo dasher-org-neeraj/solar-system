@@ -1,37 +1,37 @@
 pipeline {
 
-    agent {
-      kubernetes {
-            defaultContainer 'test-pod'
-            yaml '''
-                apiVersion: v1
-                kind: Pod
-                metadata:
-                  labels:
-                    run: test-pod
-                  name: test-pod
-                spec:
-                  containers:
-                  - command:
-                    - sleep
-                    - "99999"
-                    env:
-                        - name: CONTAINER_NAME
-                          valueFrom:
-                            fieldRef:
-                              fieldPath: metadata.name
-                    image: node:24.8.0-alpine
-                    name: test-pod
-                    resources: {}
-                  restartPolicy: Never
-            '''
-      }
-    }
-
-
 //     agent {
-//         label 'solar-system-agent'
+//       kubernetes {
+//             defaultContainer 'test-pod'
+//             yaml '''
+//                 apiVersion: v1
+//                 kind: Pod
+//                 metadata:
+//                   labels:
+//                     run: test-pod
+//                   name: test-pod
+//                 spec:
+//                   containers:
+//                   - command:
+//                     - sleep
+//                     - "99999"
+//                     env:
+//                         - name: CONTAINER_NAME
+//                           valueFrom:
+//                             fieldRef:
+//                               fieldPath: metadata.name
+//                     image: node:24.8.0-alpine
+//                     name: test-pod
+//                     resources: {}
+//                   restartPolicy: Never
+//             '''
+//       }
 //     }
+
+
+    agent {
+        label 'solar-system-agent'
+    }
 
 //     tools {
 //         nodejs "nodejs-24-4-1"
