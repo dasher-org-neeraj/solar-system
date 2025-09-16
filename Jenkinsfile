@@ -96,6 +96,8 @@ pipeline {
                                 --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f \
                                 --disableYarnAudit
                             '''
+
+                            dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
                         }
 
 //                         dependencyCheck additionalArguments: '''
@@ -106,10 +108,6 @@ pipeline {
 //                             --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f
 //                             --disableYarnAudit'''
 // //                             odcInstallation: 'dependency-check-12-1-3'
-
-                        sh 'sleep 7200'
-
-                        dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
                     }
                 }
             }
@@ -117,26 +115,32 @@ pipeline {
         stage('Unit Testing') {
             steps {
 
-                withCredentials([usernamePassword(credentialsId: 'Mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+                container('node-container') {
 
-                    echo "Seeding Planets Data For Unit Testing..."
-                    sh 'npm run db:seed'
+                    withCredentials([usernamePassword(credentialsId: 'Mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
 
-                    echo "Unit Testing In Progress..."
-                    sh 'npm run test'
+                        echo "Seeding Planets Data For Unit Testing..."
+                        sh 'npm run db:seed'
+
+                        echo "Unit Testing In Progress..."
+                        sh 'npm run test'
+                    }
                 }
             }
         }
         stage("Coverage Testing") {
             steps {
 
-                withCredentials([usernamePassword(credentialsId: 'Mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+                container('node-container') {
 
-                    catchError(buildResult: 'SUCCESS', message: 'Total Coverage is less than 90%', stageResult: 'UNSTABLE') {
+                    withCredentials([usernamePassword(credentialsId: 'Mongodb-creds', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
 
-                        echo "Coverage Testing In Progress..."
+                        catchError(buildResult: 'SUCCESS', message: 'Total Coverage is less than 90%', stageResult: 'UNSTABLE') {
 
-                        sh 'npm run coverage'
+                            echo "Coverage Testing In Progress..."
+
+                            sh 'npm run coverage'
+                        }
                     }
                 }
             }
