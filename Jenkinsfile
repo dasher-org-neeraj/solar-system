@@ -47,24 +47,6 @@ pipeline {
     }
 
     stages {
-        stage('Debug') {
-            steps {
-                sh '''
-                    set -ex
-                    echo "--- DEBUGGING AGENT ENVIRONMENT ---"
-                    echo "Running in container: $MY_CONTAINER_NAME"
-                    echo "User: $(whoami)"
-                    echo "Working Directory: $(pwd)"
-                    echo "PATH: $PATH"
-                    ls -l
-                    uname -n
-                    node -v
-                    npm version
-                    sleep 7200
-                    echo "--- END DEBUG ---"
-                '''
-            }
-        }
         stage("Install Dependencies") {
 
             options {
@@ -72,40 +54,49 @@ pipeline {
             }
 
             steps {
-                echo "Installing Dependencies..."
 
-                sh '''
-                    set -ex
-                    npm install --no-audit
-                '''
+                container('node-container') {
+                    echo "Installing Dependencies..."
+
+                    sh '''
+                        set -ex
+                        npm install --no-audit
+                    '''
+                }
             }
         }
         stage('Dependency Checking') {
             parallel {
                 stage('NPM Dependency Scanning') {
                     steps {
-                        echo "Scanning Dependencies using npm audit..."
 
-                        sh '''
-                            set -ex
-                            npm audit --audit-level=critical
-                        '''
+                        container('node-container') {
+                            echo "Scanning Dependencies using npm audit..."
+
+                            sh '''
+                                set -ex
+                                npm audit --audit-level=critical
+                            '''
+                        }
                     }
                 }
                 stage('OWASP Dependency Scanning') {
                     steps {
-                        echo "Scanning Dependencies using owasp..."
 
-                        sh '''
-                            set -ex
-                            dependency-check.sh \
-                            --scan \'./\' \
-                            --out \'./\' \
-                            --format \'ALL\' \
-                            --prettyPrint \
-                            --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f \
-                            --disableYarnAudit
-                        '''
+                        container('node-container') {
+                            echo "Scanning Dependencies using owasp..."
+
+                            sh '''
+                                set -ex
+                                dependency-check.sh \
+                                --scan \'./\' \
+                                --out \'./\' \
+                                --format \'ALL\' \
+                                --prettyPrint \
+                                --nvdApiKey b3e7726d-3647-4fc6-a293-e2db6482208f \
+                                --disableYarnAudit
+                            '''
+                        }
 
 //                         dependencyCheck additionalArguments: '''
 //                             --scan \'./\'
